@@ -1,16 +1,30 @@
+import gis.RTree;
+
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 public class Main {
 	public static void main(String[] args) {
-		
-		
+			RTree t = new RTree(5, 2);
+			try {
+				ArrayList<Segment> map = RoadParser.parseMap("streets.txt");
+				for(Segment s : map){
+					ArrayList<Line> lines = s.getLines();
+					for(Line l : lines){
+						//System.out.print(l);
+						t.insert(l.boundingBox(), l);
+					}
+				}
+				//System.out.print(t);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		
 		/*
 		try {
-			ArrayList<Segment> trace = RoadParser.parseMap("trace.txt");
+			ArrayList<Segment> trace = RoadParser.parseMap("streets.txt");
 			//ArrayList<Segment> m = segmentMerge(trace);
-			System.out.println(trace.size());
+			//System.out.println(trace.size());
 			MapFrame gui = new MapFrame(trace);
 
 			/*

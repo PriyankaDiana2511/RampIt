@@ -91,4 +91,10 @@ public class Rectangle {
 			return r;
 		}
 	}
+	@Override
+	public String toString(){
+		Point p = new Point(x,y);
+		Point p2 = new Point (width,height);
+		return p.toString()+" "+p2.toString();
+	}
 }

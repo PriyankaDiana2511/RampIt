@@ -1,3 +1,6 @@
+import gis.Point;
+import gis.Rectangle;
+
 
 public class Line implements Comparable<Line> {
 	public LinePoint p1;
@@ -32,5 +35,19 @@ public class Line implements Comparable<Line> {
 			return (int)(y1-y2);
 		}
 		return (int)(x1-x2);
+	}
+	@Override
+	public String toString(){
+		return p1.toString()+" "+p2.toString();
+	}
+	
+	public Rectangle boundingBox(){
+		double x1 = Math.min(p1.getX(), p2.getX());
+		double x2 = Math.max(p1.getX(), p2.getX());
+		double y1 = Math.min(p1.getY(), p2.getY());
+		double y2 = Math.max(p1.getY(), p2.getY());
+		double width = Math.max(1,Math.abs(x2-x1));
+		double height = Math.max(1,Math.abs(y2-y1));
+		return new Rectangle(x1,y1,width,height);
 	}
 }

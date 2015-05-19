@@ -1,3 +1,5 @@
+import gis.Point;
+
 public class LinePoint extends Point {
 	public Line line;
 	public Line line2;

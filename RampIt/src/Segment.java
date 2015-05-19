@@ -1,3 +1,5 @@
+import gis.Point;
+
 import java.util.ArrayList;
 
 public class Segment implements Comparable<Segment> {
@@ -78,15 +80,54 @@ public class Segment implements Comparable<Segment> {
 			return (int) (x1-x2);
 		}
 	}
+	public double slope(Point p1, Point p2){
+		if(p1.equals(p2)){
+			return 0;
+		}else{
+			double x1 = p1.getX();
+			double x2 = p2.getX();
+			double y1 = p1.getY();
+			double y2 = p2.getY();
+			double rise = y2-y1;
+			double run = x2-x1;
+			return rise/run;
+		}
+	}
 	
 	public ArrayList<Line> getLines(){
 		ArrayList<Line>  lines=  new ArrayList<Line>();
-		for(int i = 0; i < points.size()-1;i++){
-			Point p1 = points.get(i);
-			Point p2 = points.get(i+1);
-			Line l = new Line(p1,p2);
-			lines.add(l);
+		Point p=null;
+		Point e= null;	
+		boolean inf = false;
+		double slope = 0; //0=still, 1=right, 2= up, 3=down,4=left
+		for(int i = 0;i<points.size();i++){
+			Point c = points.get(i);
+			if(p == null){
+				p = points.get(i);
+			}else if(e == null){
+				e = points.get(i);
+				slope = slope(p,e);
+				if(p.getX() == e.getX()){
+					inf = true;
+				}
+			}else if(slope(p,c)==slope){
+				//System.out.print(slope);
+				e = p;
+			}else if(c.getX() == p.getY() && inf){
+				e = c;
+			}else{
+				Line l = new Line(p,e);
+				lines.add(l);
+				p =e;
+				e = c;
+				inf = false;
+			}
+			if( i == points.size()-1){
+				Line l = new Line(p,e);
+				lines.add(l);
+			}
 		}
+		
 		return lines;
 	}
 }

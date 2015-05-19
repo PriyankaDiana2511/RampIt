@@ -1,4 +1,6 @@
+import gis.Entry;
 import gis.RTree;
+import gis.Rectangle;
 
 import java.util.ArrayList;
 import java.util.PriorityQueue;
@@ -16,7 +18,14 @@ public class Main {
 						t.insert(l.boundingBox(), l);
 					}
 				}
-				//MapFrame gui = new MapFrame(map);
+			
+				MapFrame gui = new MapFrame(map);
+				
+				ArrayList<Entry<Rectangle,Object>> res = t.search(new Rectangle(0,0,10,10));
+				for(Entry<Rectangle,Object> e :res){
+					Object j = e.getValue();
+					System.out.println(j);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

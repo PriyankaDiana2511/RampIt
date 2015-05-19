@@ -111,8 +111,6 @@ public class Segment implements Comparable<Segment> {
 					inf = true;
 				}
 			}else if(slope(p,c)==slope){
-				e = p;
-			}else if(c.getX() == p.getY() && inf){
 				e = c;
 			}else{
 				Line l = new Line(p,e);

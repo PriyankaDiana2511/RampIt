@@ -25,10 +25,16 @@ public class Line implements Comparable<Line> {
 		}
 		return false;
 	}
+	public double slope(){
+		double rise = p2.getY()-p1.getY();
+		double run = p2.getX() - p1.getX();
+		return rise/run;
+	}
 	@Override
 	public int compareTo(Line o) {
 		double x1 = Math.min(p1.getX(), p2.getX());
 		double x2 = Math.min(o.p1.getX(), o.p2.getX());
+		System.out.print("Compare");
 		if(x1 == x2){
 			double y1 = Math.min(p1.getY(), p2.getY());
 			double y2 = Math.min(o.p1.getY(), o.p2.getY());

@@ -1,33 +1,42 @@
+import gis.RTree;
+import gis.Rectangle;
+
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.TreeMap;
 
+
 public class GeoComp {
 	public static void main(String args[]) {
-		Line l1 = new Line(1, 1, 1, 4);
-		Line l2 = new Line(1, 3, 1, 7);
-		Line l3 = new Line(2, 9, 7, 8);
-		Line l4 = new Line(4, 4, 7, 7);
-		Line l5 = new Line(5, 2, 5, 7);
-		Line l6 = new Line(7, 2, 11, 4);
-		Line l7 = new Line(8, 5, 10, 1);
+		Line l1 = new Line(1, 1, 1, 3);
+		Line l2 = new Line(0, 1, 5, 5);
+		Line l3 = new Line(0, 1, 2, 2);
+		//Line l4 = new Line(4, 4, 7, 7);
+		//Line l5 = new Line(5, 2, 5, 7);
+		//Line l6 = new Line(7, 2, 11, 4);
+		//Line l7 = new Line(8, 5, 10, 1);
 		ArrayList<Line> lines = new ArrayList<Line>();
-		 lines.add(l1);
-		 lines.add(l2);
+		lines.add(l1);
+		lines.add(l2);
 		lines.add(l3);
-		lines.add(l4);
-		 lines.add(l5);
-		lines.add(l6);
-		lines.add(l7);
+		//lines.add(l4);
+		// lines.add(l5);
+		//lines.add(l6);
+		//lines.add(l7);
 		ArrayList<LinePoint> intrs = SegmentIntersection(lines);
 		for (LinePoint i : intrs) {
+			System.out.println(i);
 		}
 
 	}
 
 	public static ArrayList<LinePoint> SegmentIntersection(ArrayList<Line> S) {
 		PriorityQueue<LinePoint> e = EventList(S);
+		RTree t = new RTree(4, 10);
+		for (Line l : S) {
+			t.insert(l.boundingBox(), l);
+		}
 		ArrayList<LinePoint> intersections = new ArrayList<LinePoint>();
 		TreeMap<Double, Line> L = new TreeMap<Double, Line>();
 		while (!e.isEmpty()) {
@@ -35,20 +44,37 @@ public class GeoComp {
 			Line s = p.line;
 			if (isLeft(p)) {
 				L.put(Math.min(s.p1.getY(), s.p2.getY()), s);
-				Line s1 = Above(L, s);
-				Line s2 = Below(L, s);
-				LinePoint intersection = Inter(s, s1);
-				if (intersection != null) {
-					e.add(intersection);
-					intersections.add(intersection);
+				if (s.p1.getX() == s.p2.getX()) {
+					ArrayList<gis.Entry<Rectangle, Object>> results = t
+							.search(s.boundingBox());
+					for (gis.Entry<Rectangle, Object> obj : results) {
+						Line l = (Line) obj.getValue();
+						LinePoint intr = Inter(s, l);
+						if (intr != null && !l.equals(s)) {
+							intr.line = s;
+							intr.line2 = l;
+							intersections.add(intr);
+							//e.add(intr);
+						}
+					}
+				} else {
+					L.put(Math.min(s.p1.getY(), s.p2.getY()), s);
+					Line s1 = Above(L, s);
+					Line s2 = Below(L, s);
+					LinePoint intersection = Inter(s, s1);
+					if (intersection != null) {
+						e.add(intersection);
+						intersections.add(intersection);
+					}
+					LinePoint intr2 = Inter(s, s2);
+					if (intr2 != null) {
+						e.add(intr2);
+						intersections.add(intr2);
+					}
 				}
-				LinePoint intr2 = Inter(s, s2);
-				if (intr2 != null) {
-					e.add(intr2);
-					intersections.add(intr2);
-				}
-			} if (isRight(p)) {
-				L.remove(Math.min(s.p1.getY(),s.p2.getY()));
+			}
+			if (isRight(p)) {
+				L.remove(Math.min(s.p1.getY(), s.p2.getY()));
 				Line s1 = Above(L, s);
 				Line s2 = Below(L, s);
 				if (s1 != null && s2 != null) {
@@ -58,9 +84,7 @@ public class GeoComp {
 						intersections.add(intersection);
 					}
 				}
-			} 
-			
-			
+			}
 			if (p.line != null && p.line2 != null) {
 				Line s1 = p.line;
 				Line s2 = p.line2;
@@ -88,8 +112,7 @@ public class GeoComp {
 				}
 				Swap(L, s1, s2);
 			}
-			
-			
+
 		}
 		return intersections;
 	}

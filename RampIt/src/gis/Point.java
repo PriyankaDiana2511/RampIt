@@ -2,7 +2,7 @@ package gis;
 import java.util.Comparator;
 
 
-public class Point implements Comparator<Point>,Comparable<Point>{
+public class Point implements Comparable<Point>{
 	private double myX;
 	private double myY;
 	
@@ -42,19 +42,10 @@ public class Point implements Comparator<Point>,Comparable<Point>{
 		return false;
 	}
 	@Override
-	public int compare(Point arg0, Point arg1) {
-		double xd = arg1.getX()-arg0.getX();
-		if(xd == 0){
-			double yd = arg1.getY()-arg0.getY();
-			return (int)yd;
-		}
-		return (int)xd;
-	}
-	@Override
 	public int compareTo(Point o) {
-		double xd = o.getX()-getX();
+		double xd = getX()-o.getX();
 		if(xd == 0){
-			double yd = o.getY()-getY();
+			double yd =getY()-o.getY();
 			return (int)yd;
 		}
 		return (int)xd;

@@ -25,7 +25,7 @@ public class RTree {
 					results.add(e);
 				}
 			}
-			return entries;
+			return results;
 		} else {
 			ArrayList<Entry<Rectangle, Object>> entries = T.entries;
 			ArrayList<Entry<Rectangle,Object>> results = new ArrayList<Entry<Rectangle,Object>>();
@@ -36,7 +36,7 @@ public class RTree {
 					results.addAll(ents);
 				}
 			}
-			return entries;
+			return results;
 		}
 	}
 
@@ -53,7 +53,7 @@ public class RTree {
 		if (x1 > x4 || x2 < x3) {
 			return false;
 		}
-		if (y1 < y3 || y2 > y4) {
+		if (y1 > y4 || y2 < y3) {
 			return false;
 		}
 
@@ -350,6 +350,9 @@ public class RTree {
 			}
 			return true;
 		}
+		public String toString(){
+			return "["+entries.size()+"]";
+		}
 	}
 
 	public int size() {
@@ -390,11 +393,6 @@ public class RTree {
 				s.append(toString(n));
 			}
 		}
-		/*
-		 * for (Entry<Rectangle, Object> e : entries) { Object o = e.getValue();
-		 * if (o instanceof Node) { Node n = (Node) o; s.append(toString(n)); }
-		 * else { s.append(o.toString()); } }
-		 */
 		return s.toString();
 	}
 }

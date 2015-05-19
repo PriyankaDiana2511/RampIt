@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-
+import gis.Point;
 public class CompGeo {
 	public static void main(String []args){
 		Line l = new Line(0,1,5,5);
@@ -7,8 +7,7 @@ public class CompGeo {
 		ArrayList<Line> lines = new ArrayList<Line>();
 		lines.add(l);
 		lines.add(l2);
-	/SegmentIntersectionTest(lines);
-		//System.out.print(inter(l,l2));
+		SegmentIntersectionTest(lines);
 	}
 
 	public static boolean SegmentIntersectionTest(ArrayList<Line> S) {
@@ -22,7 +21,7 @@ public class CompGeo {
 			Line s3 = null;
 			Line s4 = null;
 			e.remove(0);
-			if (p.equals(new Point(l.getX1(), l.getY1()))) {
+			if (p.equals(new Point(l.p1.getX(), l.p1.getY()))) {
 				Insert(L, l);
 				if (s1 != null) {
 					LinePoint intr = inter(l, s1);
@@ -38,11 +37,11 @@ public class CompGeo {
 				}
 			}
 			
-			if(p.equals(new Point(l.getX2(),l.getY2()))){
+			if(p.equals(new Point(l.p2.getX(),l.p2.getY()))){
 				L.remove(l);
 				if(s1 != null && s2 != null){
 					LinePoint intr = inter(s1,s2);
-					if(l.getX1() < intr.getX()){
+					if(l.p1.getX() < intr.getX()){
 						Insert(e,intr);
 					}
 				}

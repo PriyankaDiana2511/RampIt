@@ -38,7 +38,7 @@ public class Line implements Comparable<Line> {
 	}
 	@Override
 	public String toString(){
-		return p1.toString()+" "+p2.toString();
+		return "["+p1.toString()+" "+p2.toString()+"]";
 	}
 	
 	public Rectangle boundingBox(){

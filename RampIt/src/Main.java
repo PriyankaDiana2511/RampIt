@@ -8,14 +8,15 @@ public class Main {
 			RTree t = new RTree(5, 2);
 			try {
 				ArrayList<Segment> map = RoadParser.parseMap("streets.txt");
+				int tLines = 0;
 				for(Segment s : map){
 					ArrayList<Line> lines = s.getLines();
+					tLines += lines.size();
 					for(Line l : lines){
-						//System.out.print(l);
 						t.insert(l.boundingBox(), l);
 					}
 				}
-				//System.out.print(t);
+				//MapFrame gui = new MapFrame(map);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

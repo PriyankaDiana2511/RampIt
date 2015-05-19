@@ -21,9 +21,7 @@ public class GeoComp {
 		lines.add(l6);
 		lines.add(l7);
 		ArrayList<LinePoint> intrs = SegmentIntersection(lines);
-		System.out.println("Intersections:");
 		for (LinePoint i : intrs) {
-			System.out.print(i);
 		}
 
 	}

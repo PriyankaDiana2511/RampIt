@@ -74,7 +74,6 @@ public class MapFrame extends JFrame implements ActionListener,MouseListener,Mou
 	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		System.out.print(e.getX());
 		
 	}
 	@Override

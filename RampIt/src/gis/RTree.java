@@ -18,12 +18,25 @@ public class RTree {
 
 	public ArrayList<Entry<Rectangle, Object>> search(Rectangle S, Node T) {
 		if (T.isLeaf()) {
-
+			ArrayList<Entry<Rectangle, Object>> entries = T.entries;
+			ArrayList<Entry<Rectangle,Object>> results = new ArrayList<Entry<Rectangle,Object>>();
+			for (Entry<Rectangle, Object> e : entries) {
+				if(Overlap(e.getBounds(),S)){
+					results.add(e);
+				}
+			}
+			return entries;
 		} else {
 			ArrayList<Entry<Rectangle, Object>> entries = T.entries;
+			ArrayList<Entry<Rectangle,Object>> results = new ArrayList<Entry<Rectangle,Object>>();
 			for (Entry<Rectangle, Object> e : entries) {
-
+				Node n = (Node)e.getValue();
+				if(Overlap(n.bounds,S)){
+					ArrayList<Entry<Rectangle,Object>> ents = search(S,n);
+					results.addAll(ents);
+				}
 			}
+			return entries;
 		}
 	}
 
@@ -52,13 +65,9 @@ public class RTree {
 		if (N == root) {
 			return new Tuple<Node, Node>(N, NN);
 		}
-		if (NN != null) {
-			N.entries.removeAll(NN.entries);
-		}
 		Node P = N.parent;
 		if (NN != null) {
 			adjustBounds(NN);
-			System.out.print(NN.bounds);
 			if (P.entries.size() < M) {
 				Entry<Rectangle, Object> E1 = new Entry<Rectangle, Object>(
 						NN.bounds, NN);
@@ -67,7 +76,7 @@ public class RTree {
 				Entry<Rectangle, Object> E1 = new Entry<Rectangle, Object>(
 						NN.bounds, NN);
 				P.addEntry(E1);
-				Tuple<Node, Node> n = QuadSplit(P.entries);
+				Tuple<Node, Node> n = SplitTree(P);// QuadSplit(P.entries);
 				Node PP = n.getSecondElement();
 				return AdjustTree(P, PP);
 			}
@@ -121,23 +130,23 @@ public class RTree {
 			if (entries.size() < M) {
 				L.addEntry(new Entry<Rectangle, Object>(bounds, data));
 			} else {
-				Tuple<Node, Node> t = QuadSplit(entries);
+				Tuple<Node, Node> t = SplitTree(L);
 				Node LL = t.getSecondElement();
 				Tuple<Node, Node> k = AdjustTree(L, LL);
 				Node P = k.getFirstElement();
 				Node PP = k.getSecondElement();
 				if (PP != null) {
 					Node n = new Node();
-					Entry<Rectangle, Object> E1 = new Entry<Rectangle, Object>(
-							P.bounds, P);
+					Entry<Rectangle, Object> E1 = new Entry<Rectangle, Object>(P.bounds, P);
 					n.addEntry(E1);
-
-					Entry<Rectangle, Object> E2 = new Entry<Rectangle, Object>(
-							PP.bounds, PP);
+					
+					Entry<Rectangle, Object> E2 = new Entry<Rectangle, Object>(PP.bounds, PP);
 					n.addEntry(E2);
+					
 					root = n;
 					adjustBounds(n);
 				}
+				insert(bounds,data);
 			}
 		}
 	}
@@ -177,8 +186,7 @@ public class RTree {
 		return F;
 	}
 
-	private Tuple<Entry<Rectangle, Object>, Entry<Rectangle, Object>> PickSeeds(
-			ArrayList<Entry<Rectangle, Object>> entries) {
+	private Tuple<Entry<Rectangle, Object>, Entry<Rectangle, Object>> PickSeeds(ArrayList<Entry<Rectangle, Object>> entries) {
 		double max_d = 0;
 		Entry<Rectangle, Object> e1 = null;
 		Entry<Rectangle, Object> e2 = null;
@@ -202,8 +210,7 @@ public class RTree {
 				e1, e2);
 	}
 
-	private Tuple<Node, Node> QuadSplit(
-			ArrayList<Entry<Rectangle, Object>> entries) {
+	private Tuple<ArrayList<Entry<Rectangle, Object>>, ArrayList<Entry<Rectangle, Object>>> QuadSplit(ArrayList<Entry<Rectangle, Object>> entries) {
 		Tuple<Entry<Rectangle, Object>, Entry<Rectangle, Object>> seeds = PickSeeds(entries);
 		ArrayList<Entry<Rectangle, Object>> group1 = new ArrayList<Entry<Rectangle, Object>>();
 		ArrayList<Entry<Rectangle, Object>> group2 = new ArrayList<Entry<Rectangle, Object>>();
@@ -217,57 +224,66 @@ public class RTree {
 		r2 = e2.getBounds();
 		ArrayList<Entry<Rectangle, Object>> cpy = new ArrayList<Entry<Rectangle, Object>>();
 		cpy.addAll(entries);
+		cpy.remove(e1);
+		cpy.remove(e2);
 		while (!cpy.isEmpty()) {
+			int next = PickNext(cpy, r1, r2);
+			Entry<Rectangle, Object> e = cpy.get(next);
+			cpy.remove(next);
+			double ae1 = 0;
+			double a1 = 0;
+			double ae2 = 0;
+			double a2 = 0;
+			if (r1 == null) {
+				ae1 = e.getBounds().area();
+			} else {
+				ae1 = Rectangle.areaEnlargement(r1, e.getBounds());
+				a1 = r1.area();
+			}
+			if (r2 == null) {
+				ae2 = e.getBounds().area();
+			} else {
+				ae2 = Rectangle.areaEnlargement(r2, e.getBounds());
+				a2 = r2.area();
+			}
+
+			if (ae1 < ae2) {
+				group1.add(e);
+				r1 = Rectangle.merge(r1, e.getBounds());
+			} else if (ae2 < ae1) {
+				group2.add(e);
+				r2 = Rectangle.merge(e.getBounds(), r2);
+			} else if (a1 < a2) {
+				group1.add(e);
+				r1 = Rectangle.merge(r1, e.getBounds());
+			} else if (a2 < a1) {
+				group2.add(e);
+				r2 = Rectangle.merge(r2, e.getBounds());
+			} else {
+				group1.add(e);
+				r1 = Rectangle.merge(r1, e.getBounds());
+			}
+			
 			if (group1.size() + cpy.size() <= m) {
 				group1.addAll(cpy);
-				break;
+				cpy.clear();
 			} else if (group2.size() + cpy.size() <= m) {
 				group2.addAll(cpy);
-				break;
-			} else {
-				int next = PickNext(cpy, r1, r2);
-				Entry<Rectangle, Object> e = cpy.get(next);
-				cpy.remove(next);
-				double ae1 = 0;
-				double a1 = 0;
-				double ae2 = 0;
-				double a2 = 0;
-				if (r1 == null) {
-					ae1 = e.getBounds().area();
-				} else {
-					ae1 = Rectangle.areaEnlargement(r1, e.getBounds());
-					a1 = r1.area();
-				}
-				if (r2 == null) {
-					ae2 = e.getBounds().area();
-				} else {
-					ae2 = Rectangle.areaEnlargement(r2, e.getBounds());
-					a2 = r2.area();
-				}
+				cpy.clear();
+			} 
 
-				if (ae1 < ae2) {
-					group1.add(e);
-					r1 = Rectangle.merge(r1, e.getBounds());
-				} else if (ae2 < ae1) {
-					group2.add(e);
-					r2 = Rectangle.merge(e.getBounds(), r2);
-				} else if (a1 < a2) {
-					group1.add(e);
-					r1 = Rectangle.merge(r1, e.getBounds());
-				} else if (a2 < a1) {
-					group2.add(e);
-					r2 = Rectangle.merge(r2, e.getBounds());
-				} else {
-					group1.add(e);
-					r1 = Rectangle.merge(r1, e.getBounds());
-				}
-			}
 		}
-		Node L = new Node();
-		L.addAllEntries(group1);
-		Node LL = new Node();
-		LL.addAllEntries(group2);
-		return new Tuple<Node, Node>(L, LL);
+		return new Tuple<ArrayList<Entry<Rectangle, Object>>, ArrayList<Entry<Rectangle, Object>>>(
+				group1, group2);
+	}
+
+	private Tuple<Node, Node> SplitTree(Node N) {
+		Tuple<ArrayList<Entry<Rectangle, Object>>, ArrayList<Entry<Rectangle, Object>>> groups = QuadSplit(N.entries);
+		N.entries = new ArrayList<Entry<Rectangle, Object>>();
+		N.addAllEntries(groups.getFirstElement());
+		Node NN = new Node();
+		NN.addAllEntries(groups.getSecondElement());
+		return new Tuple<Node, Node>(N, NN);
 	}
 
 	private int PickNext(ArrayList<Entry<Rectangle, Object>> entries,
@@ -336,6 +352,23 @@ public class RTree {
 		}
 	}
 
+	public int size() {
+		return size(root);
+	}
+
+	public int size(Node n) {
+		if (n.isLeaf()) {
+			return n.entries.size();
+		} else {
+			int count = 0;
+			for (Entry<Rectangle, Object> e : n.entries) {
+				Node q = (Node) e.getValue();
+				count += size(q);
+			}
+			return count;
+		}
+	}
+
 	@Override
 	public String toString() {
 		return toString(root);
@@ -344,15 +377,24 @@ public class RTree {
 	public String toString(Node N) {
 		ArrayList<Entry<Rectangle, Object>> entries = N.entries;
 		StringBuilder s = new StringBuilder();
-		for (Entry<Rectangle, Object> e : entries) {
-			Object o = e.getValue();
-			if (o instanceof Node) {
-				Node n = (Node) o;
-				s.append(toString(n));
-			} else {
+		if (N.isLeaf()) {
+			for (Entry<Rectangle, Object> e : entries) {
+				Object o = e.getValue();
 				s.append(o.toString());
+				s.append("\t");
+			}
+			s.append("\n");
+		} else {
+			for (Entry<Rectangle, Object> e : entries) {
+				Node n = (Node) e.getValue();
+				s.append(toString(n));
 			}
 		}
+		/*
+		 * for (Entry<Rectangle, Object> e : entries) { Object o = e.getValue();
+		 * if (o instanceof Node) { Node n = (Node) o; s.append(toString(n)); }
+		 * else { s.append(o.toString()); } }
+		 */
 		return s.toString();
 	}
 }

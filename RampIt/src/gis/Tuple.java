@@ -14,4 +14,10 @@ public class Tuple<A, B> {
 	public B getSecondElement(){
 		return element2;
 	}
+	public A min(){
+		if(element1.getClass().equals(element2.getClass())){
+			System.out.print("Same Class");
+		}
+		return null;
+	}
 }

@@ -3,15 +3,15 @@ import gis.Rectangle;
 
 
 public class Line implements Comparable<Line> {
-	public LinePoint p1;
-	public LinePoint p2;
+	public Point p1;
+	public Point p2;
 	public Line(Point p1, Point p2){
-		this.p1 = new LinePoint(this,p1.getX(),p1.getY());
-		this.p2 = new LinePoint(this, p2.getX(),p2.getY());
+		this.p1 = new Point(p1.getX(),p1.getY());
+		this.p2 = new Point(p2.getX(),p2.getY());
 	}
 	public Line(int x1, int y1, int x2, int y2){
-		this.p1 = new LinePoint(this,x1,y1);
-		this.p2 = new LinePoint(this,x2,y2);
+		this.p1 = new Point(x1,y1);
+		this.p2 = new Point(x2,y2);
 	}
 	@Override
 	public boolean equals(Object o){

@@ -11,7 +11,7 @@ public class Entry<I,O> {
 	public O getValue(){
 		return this.value;
 	}
-	public I getBounds(){
+	public I getKey(){
 		return this.bounds;
 	}
 }

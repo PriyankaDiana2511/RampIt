@@ -21,7 +21,7 @@ public class RTree {
 			ArrayList<Entry<Rectangle, Object>> entries = T.entries;
 			ArrayList<Entry<Rectangle,Object>> results = new ArrayList<Entry<Rectangle,Object>>();
 			for (Entry<Rectangle, Object> e : entries) {
-				if(Overlap(e.getBounds(),S)){
+				if(Overlap(e.getKey(),S)){
 					results.add(e);
 				}
 			}
@@ -93,7 +93,7 @@ public class RTree {
 		Node nnode = (Node) N;
 		ArrayList<Entry<Rectangle, Object>> entries = nnode.entries;
 		for (Entry<Rectangle, Object> e : entries) {
-			Rectangle b = e.getBounds();
+			Rectangle b = e.getKey();
 			if (!init) {
 				minx = b.getX();
 				miny = b.getY();
@@ -192,8 +192,8 @@ public class RTree {
 		Entry<Rectangle, Object> e2 = null;
 		for (Entry<Rectangle, Object> E1 : entries) {
 			for (Entry<Rectangle, Object> E2 : entries) {
-				Rectangle r1 = E1.getBounds();
-				Rectangle r2 = E2.getBounds();
+				Rectangle r1 = E1.getKey();
+				Rectangle r2 = E2.getKey();
 				Rectangle j = Rectangle.merge(r1, r2);
 				double a1 = r1.area();
 				double a2 = r2.area();
@@ -220,8 +220,8 @@ public class RTree {
 		Entry<Rectangle, Object> e2 = seeds.getSecondElement();
 		group1.add(e1);
 		group2.add(e2);
-		r1 = e1.getBounds();
-		r2 = e2.getBounds();
+		r1 = e1.getKey();
+		r2 = e2.getKey();
 		ArrayList<Entry<Rectangle, Object>> cpy = new ArrayList<Entry<Rectangle, Object>>();
 		cpy.addAll(entries);
 		cpy.remove(e1);
@@ -235,33 +235,33 @@ public class RTree {
 			double ae2 = 0;
 			double a2 = 0;
 			if (r1 == null) {
-				ae1 = e.getBounds().area();
+				ae1 = e.getKey().area();
 			} else {
-				ae1 = Rectangle.areaEnlargement(r1, e.getBounds());
+				ae1 = Rectangle.areaEnlargement(r1, e.getKey());
 				a1 = r1.area();
 			}
 			if (r2 == null) {
-				ae2 = e.getBounds().area();
+				ae2 = e.getKey().area();
 			} else {
-				ae2 = Rectangle.areaEnlargement(r2, e.getBounds());
+				ae2 = Rectangle.areaEnlargement(r2, e.getKey());
 				a2 = r2.area();
 			}
 
 			if (ae1 < ae2) {
 				group1.add(e);
-				r1 = Rectangle.merge(r1, e.getBounds());
+				r1 = Rectangle.merge(r1, e.getKey());
 			} else if (ae2 < ae1) {
 				group2.add(e);
-				r2 = Rectangle.merge(e.getBounds(), r2);
+				r2 = Rectangle.merge(e.getKey(), r2);
 			} else if (a1 < a2) {
 				group1.add(e);
-				r1 = Rectangle.merge(r1, e.getBounds());
+				r1 = Rectangle.merge(r1, e.getKey());
 			} else if (a2 < a1) {
 				group2.add(e);
-				r2 = Rectangle.merge(r2, e.getBounds());
+				r2 = Rectangle.merge(r2, e.getKey());
 			} else {
 				group1.add(e);
-				r1 = Rectangle.merge(r1, e.getBounds());
+				r1 = Rectangle.merge(r1, e.getKey());
 			}
 			
 			if (group1.size() + cpy.size() <= m) {
@@ -294,15 +294,15 @@ public class RTree {
 		for (Entry<Rectangle, Object> e : entries) {
 			double d1 = 0;
 			if (g1 == null) {
-				d1 = e.getBounds().area();
+				d1 = e.getKey().area();
 			} else {
-				d1 = Rectangle.areaEnlargement(g1, e.getBounds());
+				d1 = Rectangle.areaEnlargement(g1, e.getKey());
 			}
 			double d2 = 0;
 			if (g2 == null) {
-				d2 = e.getBounds().area();
+				d2 = e.getKey().area();
 			} else {
-				d2 = Rectangle.areaEnlargement(g2, e.getBounds());
+				d2 = Rectangle.areaEnlargement(g2, e.getKey());
 			}
 			double d = Math.abs(d2 - d1);
 			if (d >= max_d) {
@@ -335,7 +335,7 @@ public class RTree {
 			if (o instanceof Node) {
 				Node n = (Node) o;
 				n.parent = this;
-				n.bounds = e.getBounds();
+				n.bounds = e.getKey();
 			}
 			this.entries.add(e);
 		}

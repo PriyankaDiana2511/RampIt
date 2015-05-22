@@ -56,8 +56,8 @@ public class GeoComp {
 			double b1 = y1-(m1*x1);
 			double b2 = y3-(m2*x3);
 			
-			double val1 = m1*x+b1;
-			double val2 = m2*x+b2;
+			double val1 = (m1*x)+b1;
+			double val2 = (m2*x+b2);
 			return (int) (val1-val2);
 		}
 
@@ -65,10 +65,17 @@ public class GeoComp {
 	}
 	
 	public static void main(String args[]) {
-		ArrayList<Line> lines = new ArrayList<Line>();
+		LineComparator lc = new LineComparator();
+		lc.x = 4;
+		SortedArrayList<Line> lines = new SortedArrayList<Line>(lc);
 		lines.add(new Line(0,3,6,3));
 		lines.add(new Line(0,0,6,6));
-		SegmentIntersection(lines);
+		lines.add(new Line(0,6,6,0));
+		ArrayList<Entry<Point, Tuple<Line, Line>>> els = SegmentIntersection(lines);
+		for(Entry<Point, Tuple<Line, Line>>r :els){
+			System.out.print(r.getKey());
+		}
+		//System.out.println(lines);
 	}
 
 	private static PriorityQueue<Entry<Point, Tuple<Line, Line>>> eventList(ArrayList<Line> S) {
@@ -83,13 +90,14 @@ public class GeoComp {
 		return points;
 	}
 
-	public static void SegmentIntersection(ArrayList<Line> S) {
+	public static ArrayList<Entry<Point, Tuple<Line, Line>>> SegmentIntersection(ArrayList<Line> S) {
 		PriorityQueue<Entry<Point, Tuple<Line, Line>>> e = eventList(S);
+		ArrayList<Entry<Point, Tuple<Line, Line>>> intersections = new ArrayList<Entry<Point, Tuple<Line, Line>>>();
 		LineComparator lc = new LineComparator();
 		SortedArrayList<Line> L = new SortedArrayList<Line>(lc);
 		while(!e.isEmpty()){
 			Entry<Point,Tuple<Line,Line>> ce = e.poll();
-			Point p = ce.getKey();
+			Point p = ce.getKey(); 
 			if(left(ce)){
 				Line s = ce.getValue().getFirstElement();
 				L.add(s);
@@ -97,17 +105,82 @@ public class GeoComp {
 				Line s2 = Below(L,s);
 				Point intr1 = Inter(s,s1);
 				Point intr2 = Inter(s,s2);
+				lc.x = p.getX();
 				if(intr1 != null){
-					Entry<Point<Tuple,Tuple>>
+					Tuple<Line,Line> t = new Tuple<Line,Line>(s,s1);
+					Entry<Point, Tuple<Line,Line>> tp = new Entry<Point, Tuple<Line,Line>>(intr1,t);
+					e.add(tp);
+				}
+				if(intr2 != null){
+					Tuple<Line,Line> t = new Tuple<Line,Line>(s,s2);
+					Entry<Point, Tuple<Line,Line>> tp = new Entry<Point, Tuple<Line,Line>>(intr2,t);
+					e.add(tp);
 				}
 			}else if(right(ce)){
-				System.out.print("Right");
+				Line s = ce.getValue().getFirstElement();
+				Line s1 = Above(L,s);
+				Line s2 = Below(L,s);
+				Point intr = Inter(s1,s2);
+				if(intr != null){
+					Tuple<Line,Line> t = new Tuple<Line,Line>(s1,s2);
+					Entry<Point, Tuple<Line,Line>> tp = new Entry<Point, Tuple<Line,Line>>(intr,t);
+					e.add(tp);
+					L.remove(s);
+				}
 			}else if(intersection(ce)){
-				System.out.print("Intersection");
+				intersections.add(ce);
+				double p1 = p.getX()+1;
+				Line s1 = ce.getValue().getFirstElement();
+				Line s2 = ce.getValue().getSecondElement();
+				Line s3 = Above(L,Max(p1,s1,s2));
+				Line s4 = Below(L,Min(p1,s1,s2));
+				Point intr1 = Inter(s3,Min(p1,s1,s2));
+				Point intr2 = Inter(s4,Max(p1,s1,s2));
+				Point intr3 = Inter(s3,Max(p1,s1,s2));
+				if(intr1 != null){
+					Tuple<Line,Line> t = new Tuple<Line,Line>(s3,Min(p1,s1,s2));
+					Entry<Point, Tuple<Line,Line>> tp = new Entry<Point, Tuple<Line,Line>>(intr1,t);
+					e.add(tp);
+				}
+				if(intr2 != null){
+					Tuple<Line,Line> t = new Tuple<Line,Line>(s1,Max(p1,s1,s2));
+					Entry<Point, Tuple<Line,Line>> tp = new Entry<Point, Tuple<Line,Line>>(intr3,t);
+					e.add(tp);
+				}
+				Swap(L,s1,s2);
 			}
 		}
+		return intersections;
 	}
-	
+	private static  Line Min(double x,Line s1, Line s2){
+		LineComparator c1 = new LineComparator();
+		c1.x = x;
+		int cmpr = c1.compare(s1, s2);
+		if(cmpr < 0){
+			return s1;
+		}else{
+			return s2;
+		}
+	}
+	private static Line Max(double x,Line s1, Line s2){
+		LineComparator c1 = new LineComparator();
+		c1.x = x;
+		int cmpr = c1.compare(s1, s2);
+		if(cmpr > 0){
+			return s1;
+		}else{
+			return s2;
+		}
+	}
+	private static void Swap(SortedArrayList<Line> L,Line s1,Line s2){
+		boolean k1 =L.remove(s1);
+		boolean k2 = L.remove(s2);
+		//if(k1){
+			L.add(s1);
+		//}else if(k2){
+			L.add(s2);
+		//}
+	}
 	private static boolean left(Entry<Point, Tuple<Line, Line>> e){
 		Line s = e.getValue().getFirstElement();
 		Point p = e.getKey();
@@ -206,15 +279,14 @@ public class GeoComp {
 	}
 	public static Line Above(SortedArrayList<Line> L, Line l) {
 		int index  = L.indexOf(l);
-		if(index > 0){
-			return L.get(index-1);
+		if(index > 0 && index < L.size()-2){
+			return L.get(index+1);
 		}
 		return null;
 	}
-
 	public static Line Below(SortedArrayList<Line> L, Line l) {
 		int index  = L.indexOf(l);
-		if(index >= 0 && index < L.size()){
+		if(index > 0){
 			return L.get(index-1);
 		}
 		return null;

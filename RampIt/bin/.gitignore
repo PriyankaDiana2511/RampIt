@@ -1,3 +1,11 @@
-/gis/
+/.DS_Store
 /GeoComp$EntryComparator.class
 /GeoComp$LineComparator.class
+/GeoComp.class
+/Line.class
+/Main.class
+/MapFrame.class
+/MapPanel.class
+/MapMananger.class
+/Region.class
+/gis/

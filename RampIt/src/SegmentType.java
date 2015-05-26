@@ -2,5 +2,6 @@
 public enum SegmentType {
 Sidewalk,
 Road,
-Trace
+Trace,
+Route,
 }

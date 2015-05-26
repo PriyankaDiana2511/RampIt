@@ -1,17 +1,26 @@
 package gis;
 
 public class Entry<I,O> {
-	private I bounds;
+	private I key;
 	private O value;
 	
 	public Entry(I bounds, O value){
-		this.bounds = bounds;
+		this.key = bounds;
 		this.value = value;
 	}
 	public O getValue(){
 		return this.value;
 	}
 	public I getKey(){
-		return this.bounds;
+		return this.key;
+	}
+	
+	@Override 
+	public boolean equals(Object o){
+		if(o instanceof Entry<?,?>){
+			Object c = ((Entry<?,?>) o).getKey();
+			return c.equals(key);
+		}
+		return false;
 	}
 }

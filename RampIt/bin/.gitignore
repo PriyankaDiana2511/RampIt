@@ -9,3 +9,10 @@
 /MapMananger.class
 /Region.class
 /gis/
+/SegmentAnalyzer.class
+/Edge.class
+/gsi/
+/SegmentAnalyzer$PointComparator.class
+/grah/
+/PointComparator.class
+/VertexComparator.class

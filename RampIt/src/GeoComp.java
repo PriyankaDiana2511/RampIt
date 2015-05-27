@@ -1,4 +1,5 @@
 import gis.Entry;
+import gis.Line;
 import gis.Point;
 import gis.RTree;
 import gis.Rectangle;
@@ -71,7 +72,12 @@ public class GeoComp {
 		lines.add(new Line(0,3,6,3));
 		lines.add(new Line(0,0,6,6));
 		lines.add(new Line(0,6,6,0));
+		//ArrayList<Entry<Point, Tuple<Line, Line>>> els = SegmentIntersection(lines);
+		//for(Entry<Point, Tuple<Line, Line>>r :els){
+			//System.out.print(r.getKey());
+		//}
 		//System.out.println(lines);
+		System.out.print(lineIntersectionTest(lines));
 	}
 
 	private static PriorityQueue<Entry<Point, Tuple<Line, Line>>> eventList(ArrayList<Line> S) {
@@ -286,5 +292,34 @@ public class GeoComp {
 			return L.get(index-1);
 		}
 		return null;
+	}
+	public static boolean lineIntersectionTest(ArrayList<Line> S){
+		PriorityQueue<Entry<Point, Tuple<Line, Line>>> e = eventList(S);
+		SortedArrayList<Line> L = new SortedArrayList<Line>(new LineComparator());
+		while(!e.isEmpty()){
+			Entry<Point, Tuple<Line,Line>> c = e.poll();
+			if(left(c)){
+				Line s = c.getValue().getFirstElement();
+				Point intr = Inter(Above(L,s),s);
+				Point intr2 = Inter(Below(L,s),s);
+				if(intr != null){
+					return true;
+				}
+				if(intr2 != null){
+					return true;
+				}
+			}
+			if(right(c)){
+				Line s = c.getValue().getFirstElement();
+				Line s1= Above(L,s);
+				Line s2 = Below(L,s);
+				Point intr = Inter(s1,s2);
+				if(intr != null){
+					return true;
+				}
+			}
+		}
+		return false;
+		
 	}
 }

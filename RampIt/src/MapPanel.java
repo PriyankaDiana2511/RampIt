@@ -74,6 +74,7 @@ public class MapPanel extends JPanel{
 			x[i] = x1;
 			y[i]=y1;
 		}
+		g2.drawPolyline(x, y, n);
 	}
 	public void paintWalkSegment(Graphics g, Segment s){
 		Graphics2D g2 = (Graphics2D)g;
@@ -90,6 +91,24 @@ public class MapPanel extends JPanel{
 			x[i] = x1;
 			y[i]=y1;
 		}
+		g2.drawPolyline(x, y, n);
+	}
+	public void paintTrace(Graphics g, Segment s){
+		Graphics2D g2 = (Graphics2D)g;
+		g2.setColor(Color.BLUE);
+		ArrayList<Point> points = s.getPoints();
+		int n = s.getPoints().size();
+		int[] x = new int[n];
+		int[] y = new int[n];
+		for (int i = 0; i < points.size(); i++) {
+			Point p1 = points.get(i);
+			int x1 = (int) (p1.getX() * zoom)+horizontalOffset;
+			int y1 = (int) p1.getY() * zoom+verticalOffset;
+			int stroke = Math.max(zoom/2, 1);
+			x[i] = x1;
+			y[i]=y1;
+		}
+		g2.drawPolyline(x, y, n);
 	}
 	@Override
 	public void paintComponent(Graphics g) {
@@ -103,6 +122,7 @@ public class MapPanel extends JPanel{
 				this.paintWalkSegment(g2, s);
 				
 			}else if(s.getType() == SegmentType.Trace){
+				this.paintTrace(g2, s);
 			}
 		}
 	}

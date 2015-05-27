@@ -1,5 +1,4 @@
-import gis.Point;
-import gis.Rectangle;
+package gis;
 
 
 public class Line implements Comparable<Line> {
@@ -45,7 +44,6 @@ public class Line implements Comparable<Line> {
 	public String toString(){
 		return "["+p1.toString()+" "+p2.toString()+"]";
 	}
-	
 	public Rectangle boundingBox(){
 		double x1 = Math.min(p1.getX(), p2.getX());
 		double x2 = Math.max(p1.getX(), p2.getX());
@@ -54,5 +52,18 @@ public class Line implements Comparable<Line> {
 		double width = Math.max(1,Math.abs(x2-x1));
 		double height = Math.max(1,Math.abs(y2-y1));
 		return new Rectangle(x1,y1,width,height);
+	}
+	public boolean connects(Line l2){
+		if(this.equals(l2)){
+			return false;
+		}
+		if(p1.equals(l2.p2)){
+			return true;
+		}
+		if(p2.equals(l2.p1)){
+			return false;
+		}
+
+		return false;
 	}
 }

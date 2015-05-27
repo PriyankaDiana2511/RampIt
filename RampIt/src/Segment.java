@@ -1,3 +1,4 @@
+import gis.Line;
 import gis.Point;
 
 import java.util.ArrayList;

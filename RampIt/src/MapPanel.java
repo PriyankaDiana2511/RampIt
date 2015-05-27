@@ -74,7 +74,6 @@ public class MapPanel extends JPanel{
 			x[i] = x1;
 			y[i]=y1;
 		}
-		g2.drawPolygon(x, y, n);
 	}
 	public void paintWalkSegment(Graphics g, Segment s){
 		Graphics2D g2 = (Graphics2D)g;
@@ -91,9 +90,7 @@ public class MapPanel extends JPanel{
 			x[i] = x1;
 			y[i]=y1;
 		}
-		g2.drawPolygon(x, y, n);
 	}
-	
 	@Override
 	public void paintComponent(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
@@ -106,7 +103,6 @@ public class MapPanel extends JPanel{
 				this.paintWalkSegment(g2, s);
 				
 			}else if(s.getType() == SegmentType.Trace){
-				
 			}
 		}
 	}

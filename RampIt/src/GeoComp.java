@@ -71,10 +71,6 @@ public class GeoComp {
 		lines.add(new Line(0,3,6,3));
 		lines.add(new Line(0,0,6,6));
 		lines.add(new Line(0,6,6,0));
-		ArrayList<Entry<Point, Tuple<Line, Line>>> els = SegmentIntersection(lines);
-		for(Entry<Point, Tuple<Line, Line>>r :els){
-			System.out.print(r.getKey());
-		}
 		//System.out.println(lines);
 	}
 

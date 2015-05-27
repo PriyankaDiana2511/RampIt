@@ -1,3 +1,11 @@
+<<<<<<< Updated upstream
+=======
+import gis.Entry;
+import gis.Line;
+import gis.RTree;
+import gis.Rectangle;
+
+>>>>>>> Stashed changes
 import java.util.ArrayList;
 
 

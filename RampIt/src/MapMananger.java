@@ -1,111 +1,132 @@
 import java.util.ArrayList;
+import java.util.List;
 
-import gis.Line;
-import gis.RTree;
-import gis.Point;
-import gis.Rectangle;
+import gis.graph.Edge;
+import gis.graph.Graph;
+import gis.graph.Vertex;
 import gis.Entry;
+import gis.Line;
+import gis.Point;
+import gis.RTree;
+import gis.Rectangle;
+
 public class MapMananger {
-	private RTree traces;
-	private RTree sidewalks;
-	private RTree streets;
-	private RTree obsticles;
-	
-	public ArrayList<Entry<Point,Integer>> ramps(Rectangle region){
-		int[] counts = {1,2,56,4,3};
-		ArrayList<Entry<Point,Integer>> results= new ArrayList<Entry<Point,Integer>>();
-		ArrayList<Point> traceList = new ArrayList<Point>();
-		traceList.add(new Point(5,5));
-		traceList.add(new Point(5,10));
-		traceList.add(new Point(5,15));
-		traceList.add(new Point(10,5));
-		traceList.add(new Point(10,10));
-		traceList.add(new Point(10,15));
-		traceList.add(new Point(15,5));
-		traceList.add(new Point(15,10));
-		traceList.add(new Point(15,15));
-		for(int i = 0; i < traceList.size();i++){
-			int count = 0;
-			if(i < counts.length){
-				count = counts[i];
+	private Graph<Point> graph;
+	private RTree mapTree;
+
+	public MapMananger(double th, ArrayList<Segment> m) {
+		mapTree = new RTree(10, 4);
+		for (Segment s : m) {
+			ArrayList<Line> lines = s.getLines();
+			for (Line l : lines) {
+				mapTree.insert(l.boundingBox(), l);
 			}
-			Entry<Point,Integer> e = new Entry<Point,Integer>(traceList.get(i),count);
-			results.add(e);
 		}
-		return results;
 	}
-	
-	public static boolean isShortestPath(Segment s){
-		Point p1 = s.getPoints().get(0);
-		Point p2 = s.getPoints().get(s.getPoints().size()-1);
-		double sd = p1.distance(p2);
-		double d = s.distance();
-		if(d == sd){
-			return true;
-		}
-		return false;
-	}
-	public Segment shortestPath(Segment s){
-		return shortestPath(s,0,s.getPoints().size());
-	}
-	
-	public Segment shortestPath(Segment s){
-		ArrayList<Point> points = s.getPoints();
-		if(points.size() <= 2){
-			Segment cpy = new Segment(s.getType());
-			for(Point p :points){
-				Point k = new Point(p.getX(),p.getY());
-				cpy.addPoint(k);
+
+	public static Segment toSegment(List<Vertex<?>> arg0) {
+		Segment s = new Segment(SegmentType.Route);
+		for (Vertex<?> v : arg0) {
+			Object val = v.value;
+			if (val instanceof Point) {
+				Point p = (Point) val;
+				s.addPoint(p);
 			}
-			return cpy;
-		}else{
-			int n = points.size()/2;
-			
+		}
+		return s;
+	}
+	public boolean checkVertex(Point p) {
+		boolean valid = false;
+		if (!graph.containsVetex(p)) {
+			ArrayList<Entry<Rectangle, Object>> res = mapTree.search(p.boundingBox());
+			for (Entry<Rectangle, Object> e : res) {
+				Object o = e.getValue();
+				if (o instanceof Line) {
+					Line l = (Line) o;
+					if (l.pointOnLine(p)) {
+						Vertex<Point> v = new Vertex<Point>(p);
+						Point p1 = l.p1;
+						Point p2 = l.p2;
+						Vertex<Point> v1 = graph.vertex(p1);
+						Vertex<Point> v2 = graph.vertex(p2);
+						insertVertex(v, v1, v2);
+						graph.insterVertex(v);
+					}
+				}
+			}
+		}
+		return valid;
+	}
+
+	public void insertVertex(Vertex<Point> v, Vertex<Point> v1, Vertex<Point> v2) {
+		for (int i = 0; i < v1.adjacencies.size(); i++) {
+			Edge e = v1.adjacencies.get(i);
+			Vertex<?> ve = e.target;
+			Object k = ve.value;
+			if (k.equals(v2.value)) {
+				Point p = v.value;
+				Point p1 = v1.value;
+				Point p2 = v2.value;
+				v1.adjacencies.remove(i);
+				v1.adjacencies.add(new Edge(v, p1.distance(p)));
+				v.adjacencies.add(new Edge(v2, p.distance(p2)));
+				break;
+			}
+		}
+		for (int i = 0; i < v2.adjacencies.size(); i++) {
+			Edge e = v2.adjacencies.get(i);
+			Vertex<?> ve = e.target;
+			Object k = ve.value;
+			if (k.equals(v1.value)) {
+				Point p = v.value;
+				Point p1 = v2.value;
+				Point p2 = v1.value;
+				v2.adjacencies.remove(i);
+				v2.adjacencies.add(new Edge(v, p1.distance(p)));
+				v.adjacencies.add(new Edge(v1, p.distance(p2)));
+				break;
+			}
 		}
 	}
-	
-	public static void main(String [] args){
-		Line l1 = new Line(0,0,0,100);
-		Line l2 = new Line(0,100,100,100);
-		Line l3 = new Line(100,100,100,0);
-		Line l4 = new Line(100,0,0,0);
-		Segment s1 = new Segment(SegmentType.Sidewalk);
-		s1.addPoint(l1.p1);
-		s1.addPoint(l1.p2);
-		Segment s2 = new Segment(SegmentType.Sidewalk);
-		s2.addPoint(l2.p1);
-		s2.addPoint(l2.p2);
-		Segment s3 = new Segment(SegmentType.Sidewalk);
-		s3.addPoint(l3.p1);
-		s3.addPoint(l3.p2);
-		Segment s4 = new Segment(SegmentType.Sidewalk);
-		s4.addPoint(l4.p1);
-		s4.addPoint(l4.p2);
-		
-		Segment s5 = new Segment(SegmentType.Road);
-		s5.addPoint(new Point(50,0));
-		s5.addPoint(new Point(50,100));
-		Segment s6 = new Segment(SegmentType.Road);
-		s6.addPoint(new Point(0,50));
-		s6.addPoint(new Point(100,50));
-		
-		Segment s7 = new Segment(SegmentType.Trace);
-		s7.addPoint(new Point(0,0));
-		s7.addPoint(new Point(0,100));
-		s7.addPoint(new Point(100,100));
-		//s7.addPoint(new Point(100,0));
-		ArrayList<Segment> map = new ArrayList<Segment>();
-		
-		map.add(s1);
-		map.add(s2);
-		map.add(s3);
-		map.add(s4);
-		
-		map.add(s5);
-		map.add(s6);
-		
-		map.add(s7);
-		System.out.print(isShortestPath(s7));
-		MapFrame f = new MapFrame(map);
+	public static ArrayList<Segment> Bypass(Segment trace, double th){
+		//Create a list of all corner points
+		ArrayList<Line> lines = trace.getLines();
+		ArrayList<Point> points = new ArrayList<Point>();
+		int k = 0;
+		for(Line l :lines){
+			points.add(l.p1);
+			if(k == lines.size()-1){
+				points.add(l.p2);
+			}
+			k++;
+		}
+		ArrayList<Segment> s = new ArrayList<Segment>();
+		for(int i = 3; i < points.size();i++){
+			Point p1 = points.get(i-3);
+			Point p2 = points.get(i-2);
+			Point p3 = points.get(i-1);
+			Point p4 = points.get(i);
+			Line l2 = new Line(p2,p3);
+			Line l3 = new Line(p3,p4);
+			Line l4 = new Line(p1,p4);
+			Point itr2 = GeoComp.Inter(l4,l2);
+			Point itr3 = GeoComp.Inter(l4,l3);
+			if(itr3!= null && (itr3.equals(l3.p1) || itr3.equals(l3.p2)) && !itr3.equals(l2.p1) && !itr3.equals(l2.p2)){
+				itr3 = null;
+			}
+			if(itr2 == null && itr3 == null){
+				Segment sg = new Segment(SegmentType.Warning);
+				sg.addPoint(p1);
+				sg.addPoint(p2);
+				sg.addPoint(p3);
+				sg.addPoint(p4);
+				double shortest = p1.distance(p2);
+				double d = sg.distance();
+				if(d*th > shortest){
+					s.add(sg);	
+				}
+			}
+		}
+		return s;
 	}
 }

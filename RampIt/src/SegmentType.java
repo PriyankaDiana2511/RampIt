@@ -4,4 +4,5 @@ Sidewalk,
 Road,
 Trace,
 Route,
+Warning
 }

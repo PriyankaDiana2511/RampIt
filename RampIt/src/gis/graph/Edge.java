@@ -8,6 +8,6 @@ public class Edge
     { target = argTarget; weight = argWeight; }
     @Override
     public String toString(){
-    	return "___"+weight+"___"+target;
+    	return "---"+weight+"--->"+target;
     }
 }

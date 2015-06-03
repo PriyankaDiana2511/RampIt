@@ -8,7 +8,7 @@ public class Line implements Comparable<Line> {
 		this.p1 = new Point(p1.getX(),p1.getY());
 		this.p2 = new Point(p2.getX(),p2.getY());
 	}
-	public Line(int x1, int y1, int x2, int y2){
+	public Line(double x1, double y1, double x2, double y2){
 		this.p1 = new Point(x1,y1);
 		this.p2 = new Point(x2,y2);
 	}
@@ -51,19 +51,29 @@ public class Line implements Comparable<Line> {
 		double y2 = Math.max(p1.getY(), p2.getY());
 		double width = Math.max(1,Math.abs(x2-x1));
 		double height = Math.max(1,Math.abs(y2-y1));
-		return new Rectangle(x1,y1,width,height);
+		return new Rectangle(x1-.5,y1,width,height);
 	}
-	public boolean connects(Line l2){
-		if(this.equals(l2)){
+	public boolean pointOnLine(Point p){
+		double maxX = Math.max(p1.getX(), p2.getX());
+		double minX = Math.min(p1.getX(), p2.getX());
+		if(p.getX() < minX || p.getX() > maxX){
 			return false;
 		}
-		if(p1.equals(l2.p2)){
+		double rise = p2.getY()-p1.getY();
+		double run = p2.getX()-p1.getX();
+		if(run == 0){
+			if(p.getX() == p1.getX()){
+				return true;
+			}
+			return false;
+		}
+		double m = rise/run;
+		double b = p1.getY()-(m*p1.getX());
+		double y = m*p.getX()+b;
+		if(p.getY() == y){
 			return true;
-		}
-		if(p2.equals(l2.p1)){
+		}else{
 			return false;
 		}
-
-		return false;
 	}
 }

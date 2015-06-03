@@ -1,6 +1,4 @@
 package gis;
-import java.util.Comparator;
-
 
 public class Point implements Comparable<Point>{
 	private double myX;
@@ -49,5 +47,9 @@ public class Point implements Comparable<Point>{
 			return (int)yd;
 		}
 		return (int)xd;
+	}
+	public Rectangle boundingBox(){
+		Rectangle r= new Rectangle(this.myX-.5,this.myY-.5,1,1);
+		return r;
 	}
 }

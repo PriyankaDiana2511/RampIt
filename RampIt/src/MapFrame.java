@@ -1,3 +1,4 @@
+import gis.Entry;
 import gis.Point;
 import gis.graph.Edge;
 import gis.graph.Graph;
@@ -14,6 +15,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Random;
 
 import javax.swing.JButton;
@@ -41,12 +43,13 @@ public class MapFrame extends JFrame implements ActionListener, MouseListener,
 	private Point p2;
 	private Point sDrag;
 	private Graph<Point> graph;
-
+	private Prioretizer prt;
+	
 	public static void main(String[] args) {
 
 		Graph<Point> g;
 		try {
-			g = RoadParser.generateGraph("sidewalks.txt");
+			g = RoadParser.generateGraph("sidewalks 2.txt");
 			MapFrame f = new MapFrame();
 			f.display(g);
 		} catch (Exception e) {
@@ -60,7 +63,7 @@ public class MapFrame extends JFrame implements ActionListener, MouseListener,
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		graphPanel = new GraphPanel();
 		this.add(graphPanel, BorderLayout.CENTER);
-		
+		prt = new Prioretizer();
 		JPanel tools = new JPanel();
 		zoomIn = new JButton("+");
 		zoomIn.addActionListener(this);
@@ -133,9 +136,14 @@ public class MapFrame extends JFrame implements ActionListener, MouseListener,
 			String countString = this.traces.getText();
 			int count = Integer.parseInt(countString);
 			while(count > 0){
-				this.simulateTrace(this.graphPanel.graph());
+				this.simulateTrace(this.graph);
 				count--;
 			}
+			PriorityQueue<Entry<Segment, Integer>> q = this.prt.prioretyQueue();
+			Entry<Segment, Integer> first = q.poll();
+			Segment s  = first.getKey();
+			s.setSegmentType(SegmentType.Priorety);
+			this.graphPanel.addTrace(s);
 		}else if(src == route){
 			this.route();
 		}
@@ -256,6 +264,7 @@ public class MapFrame extends JFrame implements ActionListener, MouseListener,
 		ArrayList<Segment> sgs = MapMananger.Bypass(s,1);
 		for(Segment sg : sgs){
 			this.graphPanel.addTrace(sg);
+			this.prt.insertSegment(sg);
 		}
 		return s;
 	}

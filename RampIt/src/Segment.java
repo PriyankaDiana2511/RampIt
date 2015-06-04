@@ -3,7 +3,7 @@ import gis.Point;
 
 import java.util.ArrayList;
 
-public class Segment{
+public class Segment {
 	private ArrayList<Point> points;
 	private SegmentType type;
 
@@ -43,36 +43,57 @@ public class Segment{
 	public String toString() {
 		return points.toString();
 	}
-	
-	public Segment copy(){
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Segment) {
+			Segment s = (Segment)o;
+			ArrayList<Point> points1 = getPoints();
+			ArrayList<Point> points2 = s.getPoints();
+			if (points1.size() != points2.size()) {
+				return false;
+			} else {
+				for (Point p : points1) {
+					if (!points2.contains(p)) {
+						return false;
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public Segment copy() {
 		Segment c = new Segment(getType());
 		ArrayList<Point> pts = getPoints();
-		for(Point p :pts){
-			Point pc = new Point(p.getX(),p.getY());
+		for (Point p : pts) {
+			Point pc = new Point(p.getX(), p.getY());
 			c.addPoint(pc);
 		}
 		return c;
 	}
-	public ArrayList<Line> getLines(){
-		ArrayList<Line>  lines=  new ArrayList<Line>();
+
+	public ArrayList<Line> getLines() {
+		ArrayList<Line> lines = new ArrayList<Line>();
 		Line l = null;
-		for(int i = 1; i < this.points.size();i++){
-			Point p1 = points.get(i-1);
+		for (int i = 1; i < this.points.size(); i++) {
+			Point p1 = points.get(i - 1);
 			Point p2 = points.get(i);
-			if(l == null){
-				l = new Line(p1,p2);
-			}else{
-				Line k = new Line(l.p1,p2);
-				//Line k2 = new Line(l.p2,p2);
-				if(k.pointOnLine(p1)){
-					l = new Line(l.p1,p2);
-				}else{ 
-					Line c = new Line(l.p1,l.p2);
+			if (l == null) {
+				l = new Line(p1, p2);
+			} else {
+				Line k = new Line(l.p1, p2);
+				// Line k2 = new Line(l.p2,p2);
+				if (k.pointOnLine(p1)) {
+					l = new Line(l.p1, p2);
+				} else {
+					Line c = new Line(l.p1, l.p2);
 					lines.add(c);
-					l = new Line(p1,p2);
+					l = new Line(p1, p2);
 				}
 			}
-			if(i == points.size()-1){
+			if (i == points.size() - 1) {
 				lines.add(l);
 			}
 		}

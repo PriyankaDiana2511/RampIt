@@ -111,9 +111,13 @@ public class GraphPanel extends JPanel{
 		}
 		for(Segment s :this.traces){
 			if(s.getType() == SegmentType.Trace){
-				g2.setColor(Color.ORANGE);
+				g2.setColor(Color.BLUE);
 			}else if(s.getType() == SegmentType.Warning){
-				g2.setColor(Color.RED);
+				g2.setColor(Color.ORANGE);
+			}else{
+				if(s.getType() == SegmentType.Priorety){
+					g2.setColor(Color.RED);
+				}
 			}
 			ArrayList<Line> lines = s.getLines();
 			for(Line l :lines){

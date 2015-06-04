@@ -4,5 +4,6 @@ Sidewalk,
 Road,
 Trace,
 Route,
-Warning
+Warning,
+Priorety
 }
